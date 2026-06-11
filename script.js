@@ -170,13 +170,12 @@ window.addEventListener("scroll", () => {
     }
     
     gsap.to(tween, {
-        timeScale: isScrollingDown ? 2 : -2, // Speed up on scroll down, reverse on scroll up
+        timeScale: isScrollingDown ? 2 : -2,
         duration: 0.5
     });
 
     currentScroll = window.scrollY;
 
-    // Reset back to normal speed after scrolling stops
     clearTimeout(window.scrollTimeout);
     window.scrollTimeout = setTimeout(() => {
         gsap.to(tween, {
@@ -185,3 +184,34 @@ window.addEventListener("scroll", () => {
         });
     }, 150);
 });
+
+// Initialize Vanta.js 3D Background
+if (typeof VANTA !== 'undefined') {
+    VANTA.NET({
+        el: "#vanta-bg-3d",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        color: 0xE4FF00, /* Neon Yellow */
+        backgroundColor: 0x050505, /* Pitch Black */
+        points: 10.00,
+        maxDistance: 20.00,
+        spacing: 20.00,
+        showDots: true
+    });
+}
+
+// Initialize Vanilla-Tilt
+if (typeof VanillaTilt !== 'undefined') {
+    VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+        max: 15,
+        speed: 400,
+        glare: true,
+        "max-glare": 0.1,
+        perspective: 1000
+    });
+}
