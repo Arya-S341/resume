@@ -2,7 +2,7 @@
 feather.replace();
 
 // Typing effect
-const texts = ["AI & ML Engineer", "Python Developer", "UI/UX Enthusiast", "Creative Thinker"];
+const texts = ["AI & ML Engineer", "Python Developer", "Problem Solver"];
 let count = 0;
 let index = 0;
 let currentText = "";
@@ -41,65 +41,147 @@ let isDeleting = false;
     setTimeout(type, typeSpeed);
 }());
 
-// Scroll reveal animation
-const reveals = document.querySelectorAll('.reveal');
+// Custom Cursor
+const cursorDot = document.querySelector('.cursor-dot');
+const cursorOutline = document.querySelector('.cursor-outline');
 
-function checkReveal() {
-    const windowHeight = window.innerHeight;
-    const elementVisible = 150;
+window.addEventListener('mousemove', (e) => {
+    const posX = e.clientX;
+    const posY = e.clientY;
 
-    reveals.forEach((reveal) => {
-        const elementTop = reveal.getBoundingClientRect().top;
-        if (elementTop < windowHeight - elementVisible) {
-            reveal.classList.add('active');
-        }
+    cursorDot.style.left = `${posX}px`;
+    cursorDot.style.top = `${posY}px`;
+
+    // Add a slight delay to the outline for a smooth effect
+    cursorOutline.animate({
+        left: `${posX}px`,
+        top: `${posY}px`
+    }, { duration: 500, fill: "forwards" });
+});
+
+// Magnetic Elements (Buttons, Links)
+const magneticElements = document.querySelectorAll('.magnetic, .magnetic-link');
+
+magneticElements.forEach((el) => {
+    el.addEventListener('mousemove', (e) => {
+        const position = el.getBoundingClientRect();
+        const x = e.clientX - position.left - position.width / 2;
+        const y = e.clientY - position.top - position.height / 2;
+        
+        el.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+        cursorOutline.classList.add('hover');
     });
-}
 
-window.addEventListener('scroll', checkReveal);
-// Check once on load
-checkReveal();
+    el.addEventListener('mouseleave', () => {
+        el.style.transform = `translate(0px, 0px)`;
+        cursorOutline.classList.remove('hover');
+    });
+});
 
-// Navbar background change on scroll
-const nav = document.querySelector('.glass-nav');
+// Cursor Hover effects for non-magnetic interactive elements
+const interactiveElements = document.querySelectorAll('a:not(.magnetic):not(.magnetic-link), button, .project-card, .skill-tag, .stat-box');
+interactiveElements.forEach(el => {
+    el.addEventListener('mouseenter', () => cursorOutline.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursorOutline.classList.remove('hover'));
+});
+
+// Navbar Scroll Effect
+const nav = document.querySelector('.main-nav');
 window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
-        nav.style.background = 'rgba(5, 5, 16, 0.9)';
-        nav.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.5)';
+        nav.style.background = 'rgba(5, 5, 5, 0.95)';
+        nav.style.borderBottom = '1px solid var(--neon-accent)';
     } else {
-        nav.style.background = 'rgba(5, 5, 16, 0.7)';
-        nav.style.boxShadow = 'none';
+        nav.style.background = 'rgba(5, 5, 5, 0.8)';
+        nav.style.borderBottom = '1px solid #222';
     }
 });
 
-// Initialize Vanta.js 3D Background
-if (typeof VANTA !== 'undefined') {
-    VANTA.NET({
-        el: "#vanta-bg",
-        mouseControls: true,
-        touchControls: true,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        scale: 1.00,
-        scaleMobile: 1.00,
-        color: 0x6d28d9, /* var(--accent-1) */
-        backgroundColor: 0x050510, /* var(--bg-color) */
-        points: 12.00,
-        maxDistance: 22.00,
-        spacing: 18.00,
-        showDots: true
-    });
-}
+// GSAP Animations
+gsap.registerPlugin(ScrollTrigger);
 
-// Initialize Vanilla-Tilt for 3D UI elements
-if (typeof VanillaTilt !== 'undefined') {
-    VanillaTilt.init(document.querySelectorAll(".glass-panel"), {
-        max: 8,
-        speed: 400,
-        glare: true,
-        "max-glare": 0.15,
-        scale: 1.02,
-        perspective: 1000
+// Hero Animation
+const tl = gsap.timeline();
+tl.from(".hero-title", {
+    y: 100,
+    opacity: 0,
+    duration: 1,
+    ease: "power4.out",
+    delay: 0.2
+})
+.from(".hero-subtitle-wrapper", {
+    y: 20,
+    opacity: 0,
+    duration: 0.8,
+    ease: "power3.out"
+}, "-=0.6")
+.from(".hero-desc", {
+    x: -50,
+    opacity: 0,
+    duration: 0.8,
+    ease: "power3.out"
+}, "-=0.6")
+.from(".hero-cta .btn", {
+    y: 30,
+    opacity: 0,
+    duration: 0.8,
+    stagger: 0.2,
+    ease: "power3.out"
+}, "-=0.6")
+.from(".image-box", {
+    scale: 0.8,
+    opacity: 0,
+    duration: 1,
+    ease: "power4.out"
+}, "-=1.2");
+
+// Scroll Reveal Animations
+const revealElements = document.querySelectorAll('.gs-reveal');
+
+revealElements.forEach((el) => {
+    gsap.from(el, {
+        scrollTrigger: {
+            trigger: el,
+            start: "top 85%", // Trigger when top of element hits 85% of viewport
+            toggleActions: "play none none reverse"
+        },
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power3.out"
     });
-}
+});
+
+// Marquee Animation (Handled by CSS, but can add GSAP speed modulation based on scroll)
+let currentScroll = 0;
+let isScrollingDown = true;
+let tween = gsap.to(".marquee-content", {
+    xPercent: -50,
+    repeat: -1,
+    duration: 10,
+    ease: "linear"
+}).totalProgress(0.5); // Start in the middle
+
+window.addEventListener("scroll", () => {
+    if (window.scrollY > currentScroll) {
+        isScrollingDown = true;
+    } else {
+        isScrollingDown = false;
+    }
+    
+    gsap.to(tween, {
+        timeScale: isScrollingDown ? 2 : -2, // Speed up on scroll down, reverse on scroll up
+        duration: 0.5
+    });
+
+    currentScroll = window.scrollY;
+
+    // Reset back to normal speed after scrolling stops
+    clearTimeout(window.scrollTimeout);
+    window.scrollTimeout = setTimeout(() => {
+        gsap.to(tween, {
+            timeScale: isScrollingDown ? 1 : -1,
+            duration: 0.5
+        });
+    }, 150);
+});
