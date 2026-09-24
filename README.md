@@ -17,6 +17,12 @@ This project showcases a clean, lightweight portfolio layout with:
 - `style.css` — styling and layout
 - `script.js` — interactive functionality
 
+## Highlights
+
+- Animated hero section with an interactive typing effect
+- Responsive sections for experience, projects, skills, and certifications
+- GitHub and Credly links for featured work and credentials
+
 ## How to Run
 
 1. Open `index.html` in a browser, or
